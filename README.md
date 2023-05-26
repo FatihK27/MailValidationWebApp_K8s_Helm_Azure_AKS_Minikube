@@ -1,5 +1,4 @@
-### You can use this repo in order to create Kubernetes cluster and deploy stack that includes Truemail, Postgres, Rabbitmq, PGAdmin, Mail validation web app and mail validation worker service with helm package manager in linux container.
-
+### You can use this repo in order to create Kubernetes cluster and deploy stack that includes Truemail, Postgres, Rabbitmq, PGAdmin, Mail validation web app and mail validation worker service with helm package manager in linux container. Also you can deploy to the Azure AKS Cluster by following instructions in the [azure-aks.md](https://github.com/FatihK27/MailValidationWebApp_K8s_Helm_Azure_AKS_Minikube/blob/main/azure-aks.md) file.
 
 
 Prerequisites:
