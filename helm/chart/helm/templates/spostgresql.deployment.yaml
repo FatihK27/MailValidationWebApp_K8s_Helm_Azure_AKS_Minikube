@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: '{{ .Release.Name }}-spostgresql'
+  labels:
+    component: spostgresql
+    project: '{{ .Chart.Name }}'
+    release: '{{ .Release.Name }}'
+  annotations:
+    docker-compose-sha1: 16e51bd9928b2de1c735e032cedc3f7440a44684
+    version: 2.0.0-beta2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: spostgresql
+      release: '{{ .Release.Name }}'
+  template:
+    metadata:
+      labels:
+        component: spostgresql
+        release: '{{ .Release.Name }}'
+    spec:
+      containers:
+        - name: spostgresql
+          image: '{{ .Values.spostgresql.repository.image }}{{ if ne .Values.spostgresql.repository.tag "" }}:{{ .Values.spostgresql.repository.tag }}{{ end }}'
+          ports:
+            - name: spostgresql
+              containerPort: 5432
+          env:
+            - name: PGTZ
+              value: '{{ tpl .Values.spostgresql.environment.PGTZ . }}'
+            - name: POSTGRES_DB
+              value: '{{ tpl .Values.spostgresql.environment.POSTGRES_DB . }}'
+            - name: POSTGRES_PASSWORD
+              value: '{{ tpl .Values.spostgresql.environment.POSTGRES_PASSWORD . }}'
+            - name: POSTGRES_USER
+              value: '{{ tpl .Values.spostgresql.environment.POSTGRES_USER . }}'
+            - name: PGDATA
+              value: '{{ tpl .Values.spostgresql.environment.PGDATA . }}'
+            - name: TZ
+              value: '{{ tpl .Values.spostgresql.environment.TZ . }}'
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+            periodSeconds: 10
+            initialDelaySeconds: 0
+            successThreshold: 1
+            failureThreshold: 3
+

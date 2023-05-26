@@ -1,0 +1,56 @@
+{
+  "profiles": {
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "Huawei.WebUIMailValidate": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production",
+        "ASPNETCORE_DETAILED_ERRORS": "1",
+        "TrueMail__ServiceUrl": "",
+        "TrueMail__ValidationToken": "",
+        "ConnectionStrings__Postgres": "",
+        "RabbitMq__ServiceUrl": "",
+        "RabbitMq__user": "",
+        "RabbitMq__pass": ""
+      },
+      "dotnetRunMessages": "true"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "publishAllPorts": true,
+      "useSSL": false
+    }
+  },
+  "Huawei.WebUIMailValidate": {
+    "commandName": "Project",
+    "launchBrowser": true,
+    "environmentVariables": {
+      "ASPNETCORE_ENVIRONMENT": "Development",
+      "ASPNETCORE_DETAILED_ERRORS": "1",
+      "TrueMail__ServiceUrl": "",
+      "TrueMail__ValidationToken": "",
+      "ConnectionStrings__Postgres": "",
+      "RabbitMq__ServiceUrl": "",
+      "RabbitMq__user": "",
+      "RabbitMq__pass": ""
+    },
+    "dotnetRunMessages": "true"
+  },
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:45555",
+      "sslPort": 44321
+    }
+  }
+}

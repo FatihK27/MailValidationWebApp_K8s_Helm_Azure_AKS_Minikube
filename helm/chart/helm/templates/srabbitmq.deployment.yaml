@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: '{{ .Release.Name }}-srabbitmq'
+  labels:
+    component: srabbitmq
+    project: '{{ .Chart.Name }}'
+    release: '{{ .Release.Name }}'
+  annotations:
+    docker-compose-sha1: 16e51bd9928b2de1c735e032cedc3f7440a44684
+    version: 2.0.0-beta2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: srabbitmq
+      release: '{{ .Release.Name }}'
+  template:
+    metadata:
+      labels:
+        component: srabbitmq
+        release: '{{ .Release.Name }}'
+    spec:
+      containers:
+        - name: srabbitmq
+          image: '{{ .Values.srabbitmq.repository.image }}{{ if ne .Values.srabbitmq.repository.tag "" }}:{{ .Values.srabbitmq.repository.tag }}{{ end }}'
+          ports:
+            - name: srabbitmq
+              containerPort: 5672
+            - name: srabbitmq-15672
+              containerPort: 15672
+          env:
+            - name: RABBITMQ_DEFAULT_PASS
+              value: '{{ tpl .Values.srabbitmq.environment.RABBITMQ_DEFAULT_PASS . }}'
+            - name: TZ
+              value: '{{ tpl .Values.srabbitmq.environment.TZ . }}'
+            - name: RABBITMQ_DEFAULT_USER
+              value: '{{ tpl .Values.srabbitmq.environment.RABBITMQ_DEFAULT_USER . }}'
+          volumeMounts:
+            - mountPath: /var/lib/rabbitmq
+              name: rabbitmq
+          livenessProbe:
+            exec:
+              #command:
+                #- rabbitmq-diagnostics check_running 2>&1 | grep running || exit 1
+              # Stage 2 check:
+              command: ["rabbitmq-diagnostics", "status"]
+            periodSeconds: 60
+            timeoutSeconds: 15
+            initialDelaySeconds: 60
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              # Stage 1 check:
+              command: ["rabbitmq-diagnostics", "ping"]
+            initialDelaySeconds: 20
+            periodSeconds: 60
+            timeoutSeconds: 10            
+      volumes:
+        - name: rabbitmq
+          {{- if  .Values.srabbitmq.persistence.rabbitmq.enabled }}
+          persistentVolumeClaim:
+            claimName: '{{ .Release.Name }}-rabbitmq'
+          {{ else }}
+          emptyDir: {}
+          {{- end }}
+

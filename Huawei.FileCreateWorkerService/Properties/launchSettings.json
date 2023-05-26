@@ -1,0 +1,20 @@
+{
+  "profiles": {
+    "Huawei.FileCreateWorkerService": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "TrueMail__ServiceUrl": "",
+        "TrueMail__ValidationToken": "",
+        "ConnectionStrings__Postgres": "",
+        "RabbitMq__ServiceUrl": "",
+        "RabbitMq__user": "",
+        "RabbitMq__pass": ""
+      },
+      "dotnetRunMessages": true
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

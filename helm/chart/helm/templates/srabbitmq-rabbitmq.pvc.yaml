@@ -1,0 +1,20 @@
+{{ if .Values.srabbitmq.persistence.rabbitmq.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: '{{ .Release.Name }}-rabbitmq'
+  labels:
+    component: srabbitmq
+    project: '{{ .Chart.Name }}'
+    pvc-name: rabbitmq
+    release: '{{ .Release.Name }}'
+  annotations:
+    docker-compose-sha1: 16e51bd9928b2de1c735e032cedc3f7440a44684
+    version: 2.0.0-beta2
+spec:
+  resources:
+    requests:
+      storage: '{{ .Values.srabbitmq.persistence.rabbitmq.capacity }}'
+  accessModes:
+    - ReadWriteOnce
+{{- end -}}

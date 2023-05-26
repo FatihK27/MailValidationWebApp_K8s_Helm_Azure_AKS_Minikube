@@ -1,0 +1,63 @@
+#Change values by your needs
+
+spgadmin:
+  environment:
+    PGADMIN_DEFAULT_EMAIL: youremail@outlook.com
+    PGADMIN_DEFAULT_PASSWORD: your_pgadmin_default_password
+    TZ: Europe/Istanbul
+  persistence:
+    pgadmindata:
+      capacity: 1Gi
+      enabled: false
+  repository:
+    image: dpage/pgadmin4
+    tag: latest
+spostgresql:
+  environment:
+    PGDATA: /var/lib/postgresql/data/pgdata
+    PGTZ: Europe/Istanbul
+    POSTGRES_DB: MailValidation
+    POSTGRES_PASSWORD: your_postgres_password
+    POSTGRES_USER: root
+    TZ: Europe/Istanbul
+  repository:
+    image: postgres
+    tag: ""
+srabbitmq:
+  environment:
+    RABBITMQ_DEFAULT_PASS: your_rabbitmq_default_pass
+    RABBITMQ_DEFAULT_USER: root
+    TZ: Europe/Istanbul
+  persistence:
+    rabbitmq:
+      capacity: 1Gi
+      enabled: false
+  repository:
+    image: rabbitmq
+    tag: 3.11.15-management
+struemail:
+  environment:
+    ACCESS_TOKENS: your_access_token
+    TZ: Europe/Istanbul
+    VERIFIER_EMAIL: test@yourdomain.com # for ex: myemail@mycompany.com
+  repository:
+    image: truemail/truemail-rack
+    tag: v0.8.0
+swebapp:
+  repository:
+    image: fatih27/mailvalidationui
+    tag: ""
+  environment:
+    # "mva" prefix is coming from "helm install release name". You can change it with your release name that you planned 
+    TrueMail__ValidationToken: your_access_token
+    RabbitMq__pass: your_rabbitmq_default_pass
+    Rabbitmq__user: root
+sworker:
+  environment:
+    TrueMail__ValidationToken: your_access_token
+    RabbitMq__pass: your_rabbitmq_default_pass
+    Rabbitmq__user: root
+  repository:
+    image: fatih27/validationworkerservice
+    tag: "latest"
+

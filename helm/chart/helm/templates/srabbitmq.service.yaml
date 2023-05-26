@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: '{{ .Release.Name }}-srabbitmq'
+  labels:
+    component: srabbitmq
+    project: '{{ .Chart.Name }}'
+    release: '{{ .Release.Name }}'
+  annotations:
+    docker-compose-sha1: 16e51bd9928b2de1c735e032cedc3f7440a44684
+    version: 2.0.0-beta2
+spec:
+  type: ClusterIP
+  selector:
+    component: srabbitmq
+    release: '{{ .Release.Name }}'
+  ports:
+    - name: apiaccess
+      protocol: TCP
+      port: 5672
+      targetPort: 5672
+    - name: webuiaccess
+      protocol: TCP
+      port: 15672
+      targetPort: 15672

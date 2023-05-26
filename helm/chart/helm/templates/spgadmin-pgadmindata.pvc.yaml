@@ -1,0 +1,20 @@
+{{ if .Values.spgadmin.persistence.pgadmindata.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: '{{ .Release.Name }}-pgadmindata'
+  labels:
+    component: spgadmin
+    project: '{{ .Chart.Name }}'
+    pvc-name: pgadmindata
+    release: '{{ .Release.Name }}'
+  annotations:
+    docker-compose-sha1: 16e51bd9928b2de1c735e032cedc3f7440a44684
+    version: 2.0.0-beta2
+spec:
+  resources:
+    requests:
+      storage: '{{ .Values.spgadmin.persistence.pgadmindata.capacity }}'
+  accessModes:
+    - ReadWriteOnce
+{{- end -}}

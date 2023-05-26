@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: '{{ .Release.Name }}-sworker'
+  labels:
+    component: sworker
+    project: '{{ .Chart.Name }}'
+    release: '{{ .Release.Name }}'
+  annotations:
+    docker-compose-sha1: 16e51bd9928b2de1c735e032cedc3f7440a44684
+    version: 2.0.0-beta2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: sworker
+      release: '{{ .Release.Name }}'
+  template:
+    metadata:
+      labels:
+        component: sworker
+        release: '{{ .Release.Name }}'
+    spec:
+      initContainers:
+        - name: check-srabbitmq
+          image: amouat/network-utils
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          command: ["sh", "-c", "until curl -s http://mva-srabbitmq.$NAMESPACE.svc.cluster.local:15672; do sleep 1; done"]
+        - name: check-struemail
+          image: amouat/network-utils
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: RELEASE
+              value: {{ .Release.Name }}
+          command: ["sh", "-c", "until curl -s http://$RELEASE-struemail.$NAMESPACE.svc.cluster.local:9292; do sleep 1; done"]
+        - name: check-spostgresql
+          image: alpine
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace       
+            - name: RELEASE
+              value: {{ .Release.Name }}                        
+          command: ["/bin/sh", "-c"]
+          args:
+          - apk add --no-cache postgresql-client
+          - pg_isready --host=$RELEASE-spostgresql.$NAMESPACE.svc.cluster.local --port=5432                  
+      containers:
+        - name: sworker
+          image: '{{ .Values.sworker.repository.image }}{{ if ne .Values.sworker.repository.tag "" }}:{{ .Values.sworker.repository.tag }}{{ end }}'
+          env:
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: RELEASE
+            value: {{ .Release.Name }}          
+          - name: "TrueMail__ServiceUrl"
+            value: "http://$(RELEASE)-struemail.$(NAMESPACE).svc.cluster.local:9292"
+          - name: TrueMail__ValidationToken
+            value: '{{ tpl .Values.swebapp.environment.TrueMail__ValidationToken . }}'
+          - name: ConnectionStrings__Postgres
+            value: "Server=$(RELEASE)-spostgresql.$(NAMESPACE).svc.cluster.local;Port=5432;Database=MailValidation;User Id=root;Password=your_postgres_password;"
+          - name: RabbitMq__ServiceUrl
+            value: $(RELEASE)-srabbitmq.$(NAMESPACE).svc.cluster.local
+          - name: RabbitMq__user
+            value: '{{ tpl .Values.swebapp.environment.Rabbitmq__user . }}'
+          - name: RabbitMq__pass
+            value: '{{ tpl .Values.swebapp.environment.RabbitMq__pass . }}'                  

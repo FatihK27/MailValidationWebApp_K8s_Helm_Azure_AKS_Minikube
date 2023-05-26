@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: '{{ .Release.Name }}-spgadmin'
+  labels:
+    component: spgadmin
+    project: '{{ .Chart.Name }}'
+    release: '{{ .Release.Name }}'
+  annotations:
+    docker-compose-sha1: 16e51bd9928b2de1c735e032cedc3f7440a44684
+    version: 2.0.0-beta2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: spgadmin
+      release: '{{ .Release.Name }}'
+  template:
+    metadata:
+      labels:
+        component: spgadmin
+        release: '{{ .Release.Name }}'
+    spec:
+      containers:
+        - name: spgadmin
+          image: '{{ .Values.spgadmin.repository.image }}{{ if ne .Values.spgadmin.repository.tag "" }}:{{ .Values.spgadmin.repository.tag }}{{ end }}'
+          ports:
+            - name: spgadmin
+              containerPort: 80
+          env:
+            - name: PGADMIN_DEFAULT_PASSWORD
+              value: '{{ tpl .Values.spgadmin.environment.PGADMIN_DEFAULT_PASSWORD . }}'
+            - name: TZ
+              value: '{{ tpl .Values.spgadmin.environment.TZ . }}'
+            - name: PGADMIN_DEFAULT_EMAIL
+              value: '{{ tpl .Values.spgadmin.environment.PGADMIN_DEFAULT_EMAIL . }}'
+          volumeMounts:
+            - mountPath: /var/lib/pgadmin
+              name: pgadmindata
+      volumes:
+        - name: pgadmindata
+          {{- if  .Values.spgadmin.persistence.pgadmindata.enabled }}
+          persistentVolumeClaim:
+            claimName: '{{ .Release.Name }}-pgadmindata'
+          {{ else }}
+          emptyDir: {}
+          {{- end }}
+

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: '{{ .Release.Name }}-struemail'
+  labels:
+    component: struemail
+    project: '{{ .Chart.Name }}'
+    release: '{{ .Release.Name }}'
+  annotations:
+    docker-compose-sha1: 16e51bd9928b2de1c735e032cedc3f7440a44684
+    version: 2.0.0-beta2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: struemail
+      release: '{{ .Release.Name }}'
+  template:
+    metadata:
+      labels:
+        component: struemail
+        release: '{{ .Release.Name }}'
+    spec:
+      containers:
+        - name: struemail
+          image: '{{ .Values.struemail.repository.image }}{{ if ne .Values.struemail.repository.tag "" }}:{{ .Values.struemail.repository.tag }}{{ end }}'
+          ports:
+            - name: struemail
+              containerPort: 9292
+          env:
+            - name: VERIFIER_EMAIL
+              value: '{{ tpl .Values.struemail.environment.VERIFIER_EMAIL . }}'
+            - name: ACCESS_TOKENS
+              value: '{{ tpl .Values.struemail.environment.ACCESS_TOKENS . }}'
+            - name: TZ
+              value: '{{ tpl .Values.struemail.environment.TZ . }}'
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 9292
+            periodSeconds: 10
+            initialDelaySeconds: 15
+            successThreshold: 1
+            failureThreshold: 3
+

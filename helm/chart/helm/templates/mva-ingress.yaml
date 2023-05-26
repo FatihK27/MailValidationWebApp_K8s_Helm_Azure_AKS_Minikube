@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webapp-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  labels:
+    release: '{{ .Release.Name }}'
+    project: '{{ .Chart.Name }}'
+spec:
+  rules:
+  - http:
+      paths:
+      # - path: /webapp(/|$)(.*)
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: '{{ .Release.Name }}-swebapp'
+      #       port:
+      #         number: 8090
+      # - path: /rabbitmq(/|$)(.*)
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: '{{ .Release.Name }}-srabbitmq'
+      #       port:
+      #         number: 15672
+      # - path: /pgadmin(/|$)(.*)
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: '{{ .Release.Name }}-spgadmin'
+      #       port:
+      #         number: 80              
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: '{{ .Release.Name }}-swebapp'
+            port:
+              number: 8090
+---
