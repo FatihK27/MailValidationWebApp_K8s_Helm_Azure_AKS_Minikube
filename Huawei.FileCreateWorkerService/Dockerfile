@@ -8,10 +8,10 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["Huawei.FileCreateWorkerService/Huawei.RabbitMqSubscriberService.csproj", "Huawei.FileCreateWorkerService/"]
-RUN dotnet restore "Huawei.FileCreateWorkerService/Huawei.RabbitMqSubscriberService.csproj"
-COPY . .
-WORKDIR "/src/Huawei.FileCreateWorkerService"
+COPY ["Huawei.RabbitMqSubscriberService.csproj", "./"]
+RUN dotnet restore
+COPY . ./
+WORKDIR "/src"
 RUN dotnet build "Huawei.RabbitMqSubscriberService.csproj" -c Release -o /app/build
 
 FROM build AS publish

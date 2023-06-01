@@ -9,10 +9,10 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["Huawei.WebUIMailValidate/Huawei.WebUIMailValidate.csproj", "Huawei.WebUIMailValidate/"]
-RUN dotnet restore "Huawei.WebUIMailValidate/Huawei.WebUIMailValidate.csproj"
-COPY . .
-WORKDIR "/src/Huawei.WebUIMailValidate"
+COPY ["*.csproj", "./"]
+RUN dotnet restore
+COPY . ./
+WORKDIR "/src"
 RUN dotnet build "Huawei.WebUIMailValidate.csproj" -c Release -o /app/build
 
 FROM build AS publish
